@@ -13,126 +13,65 @@ MongoClient.connect(url, function (err, db) {
     if (err) throw err
     dbo = db.db("Userdb")
 })
-// app.post('/init', function (req, res) {
-//     var testContacts = [
-//         {
-//             id: "1",
-//             firstname: "potato",
-//             lastname: "tomato",
-//             phonenum: "0895126656",
-//             email: "potato@email.com",
-//             fb: "null",
-//             image:
-//                 "https://semantic-ui-vue.github.io/static/images/avatar/large/jenny.jpg",
-//         },
-//         {
-//             id: "2",
-//             firstname: "Water",
-//             lastname: "Melon",
-//             phonenum: "0842135564",
-//             email: "null@email.com",
-//             fb: "null",
-//             image:
-//                 "https://semantic-ui-vue.github.io/static/images/avatar/large/elliot.jpg",
-//         },
-//         {
-//             id: "3",
-//             firstname: "Honey",
-//             lastname: "Dew",
-//             phonenum: "0951234484",
-//             email: "null@email.com",
-//             fb: "null",
-//             image:
-//                 "https://semantic-ui-vue.github.io/static/images/avatar/large/elyse.png",
-//         },
-//         {
-//             id: "4",
-//             firstname: "Honey",
-//             lastname: "Dew",
-//             phonenum: "0951234484",
-//             email: "null@email.com",
-//             fb: "null",
-//             image:
-//                 "https://semantic-ui-vue.github.io/static/images/avatar/large/elyse.png",
-//         },
-//         {
-//             id: "5",
-//             firstname: "Honey",
-//             lastname: "Dew",
-//             phonenum: "0951234484",
-//             email: "null@email.com",
-//             fb: "null",
-//             image:
-//                 "https://semantic-ui-vue.github.io/static/images/avatar/large/elyse.png",
-//         },
-//     ]
-//     dbo.collection('contacts').insertMany(testContacts, function (err, resp) {
-//         if (err) throw err;
-//         console.log("Number of documents inserted: " + res.insertedCount);
-//         res.send()
-//     })
-// })
-app.get('/contacts/getmany', function (req, res) {
-    dbo.collection("contacts").find().sort({ id: 1 }).toArray(function (err, result) {
+app.get('/home/update', function (req, res) {
+    console.log(req.query)
+    var query = { _id: ObjectID(req.query._id) };
+    dbo.collection("slaves").find(query).toArray(function (err, result) {
         if (err) throw err
         console.log(result)
         res.send(JSON.stringify(result))
     })
+})
 
-})
-app.post('/contacts/add', function (req, res) {
-    console.log(req.body)
-    dbo.collection("contacts").insertOne(req.body, function (err, result) {
-        if (err) throw err
-        console.log(result)
-        res.send(JSON.stringify(result))
-    })
-})
-app.put('/contacts/update', function (req, res) {
+app.put('/pg/update', function (req, res) {
     console.log('\n\n\n\n\n\n\n\nupdate')
-    console.log(req.body)
-    var myquery = { _id: ObjectID(req.body._id) };
+    console.log(req.query)
+    var myquery = { _id: ObjectID(req.query._id) };
     console.log(myquery)
-    var newvalues = {
-        $set: {
-            id: req.body.id,
-            firstname: req.body.firstname,
-            lastname: req.body.lastname,
-            phonenum: req.body.phonenum,
-            email: req.body.email,
-            fb: req.body.fb,
-            image:
-                req.body.image,
-        }
+    var newvalues;
+    switch (req.query.id) {
+        case '1': newvalues = {
+            $set: {
+                1: req.query.data,
+            }
+        }; break;
+        case '2': newvalues = {
+            $set: {
+                2: req.query.data,
+            }
+        }; break;
+        case '3': newvalues = {
+            $set: {
+                3: req.query.data,
+            }
+        }; break;
+        case '4': newvalues = {
+            $set: {
+                4: req.query.data,
+            }
+        }; break;
+        case '5': newvalues = {
+            $set: {
+                5: req.query.data,
+            }
+        }; break;
     }
-    dbo.collection("contacts").updateOne(myquery, newvalues, function (err, res) {
+    console.log(newvalues)
+    dbo.collection("slaves").updateOne(myquery, newvalues, function (err, res) {
         if (err) throw err;
         console.log(res.result.nModified + " document(s) updated");
     });
+    console.log('newvalues')
     return res.send(myquery)
 });
-app.post('/contacts/delete', function (req, res) {
-    console.log('/contacts/delete')
-    console.log(req.body)
-    var myquery = { _id: ObjectID(req.body._id)};
-    dbo.collection("contacts").deleteOne(myquery, function (err, obj) {
-        if (err) throw err;
-        console.log("1 document deleted");
-        return res.send()
-    })
-});
-app.post('/contacts', function (req, res) {
+app.post('/slaves', function (req, res) {
     // var myquery = {  };
-    console.log(req.body)
-    dbo.collection("user").find(req.body).toArray(function (err, result) {
+    console.log(req.query)
+    dbo.collection("slaves").find(req.query).toArray(function (err, result) {
         if (err) throw err;
         console.log(result);
         res.send(JSON.stringify(result));
     })
 })
 
-var server = app.listen(3000, function () {
-    var host = server.address().address
-    var port = server.address().port
-    console.log("Application run at http://%s:%s", host, port)
-})
+app.listen(9000, 'localhost')
